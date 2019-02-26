@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @Transactional
@@ -37,6 +38,11 @@ public class JpaRunner implements ApplicationRunner {
         Session sesseion = entityManager.unwrap(Session.class);
         sesseion.save(account);
         sesseion.save(store);
+
+        Thread.sleep(3000);
+
+        account.setUpdater("sangmin10.kim");
+        sesseion.save(account);
 
     }
 }

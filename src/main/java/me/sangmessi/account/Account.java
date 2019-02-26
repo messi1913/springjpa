@@ -21,10 +21,10 @@ public class Account {
     private String password;
     private String email;
     private int mobileNumber;
-    @Temporal(TemporalType.TIME)
-    private Date created;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date created = new Date();
     private String creator;
-    @Temporal(TemporalType.TIME)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date updated;
     private String updater;
 
