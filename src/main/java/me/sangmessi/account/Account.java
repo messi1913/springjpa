@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import me.sangmessi.store.Store;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,6 +21,13 @@ public class Account {
     private String password;
     private String email;
     private int mobileNumber;
+    @Temporal(TemporalType.TIME)
+    private Date created;
+    private String creator;
+    @Temporal(TemporalType.TIME)
+    private Date updated;
+    private String updater;
+
     @OneToMany(mappedBy = "owner")
     private Set<Store> stores = new HashSet<>();
 
