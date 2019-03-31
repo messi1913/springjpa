@@ -10,12 +10,15 @@ import me.sangmessi.common.Auditable;
 import me.sangmessi.store.Store;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Entity
 @Data
 @EntityListeners(AuditListener.class)
 @ToString(exclude = {"store", "customer"})
+@EqualsAndHashCode(of = "id")
 public class Reservation implements Auditable {
 
     @Embedded
@@ -24,8 +27,10 @@ public class Reservation implements Auditable {
     @GeneratedValue @Id
     private long id;
     @Column(nullable = false)
+    @NotNull
     private LocalDateTime bookedOn;
     @Column(nullable = false)
+    @NotNull
     private int memberNumber;
 
     @ManyToOne

@@ -16,7 +16,7 @@ import java.util.Set;
 
 @Data
 @Entity
-@EqualsAndHashCode(exclude = { "reservations"})
+@EqualsAndHashCode(of = "id")
 @EntityListeners(AuditListener.class)
 @ToString(exclude = {"owner", "reservations"})
 public class Store implements Auditable {
@@ -43,7 +43,6 @@ public class Store implements Auditable {
         this.reservations.add(reservation);
         reservation.setStore(this);
     }
-
 
 
 }

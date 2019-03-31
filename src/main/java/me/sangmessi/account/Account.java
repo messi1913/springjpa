@@ -15,7 +15,7 @@ import java.util.Set;
 
 @Data
 @Entity
-@EqualsAndHashCode(exclude = {"stores", "reservations"})
+@EqualsAndHashCode(of = "id")
 @EntityListeners(AuditListener.class)
 @ToString(exclude = {"stores", "reservations"})
 public class Account implements Auditable {
