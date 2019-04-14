@@ -3,8 +3,6 @@ package me.sangmessi;
 import me.sangmessi.account.Account;
 import me.sangmessi.account.AccountDTO;
 import me.sangmessi.account.AccountRepository;
-import me.sangmessi.account.QAccount;
-import me.sangmessi.reservation.Reservation;
 import me.sangmessi.store.FoodType;
 import me.sangmessi.store.Store;
 import me.sangmessi.store.StoreRepository;
