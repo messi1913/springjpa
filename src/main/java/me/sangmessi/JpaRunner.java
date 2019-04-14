@@ -3,6 +3,7 @@ package me.sangmessi;
 import me.sangmessi.account.Account;
 import me.sangmessi.account.AccountDTO;
 import me.sangmessi.account.AccountRepository;
+import me.sangmessi.account.QAccount;
 import me.sangmessi.reservation.Reservation;
 import me.sangmessi.store.FoodType;
 import me.sangmessi.store.Store;
@@ -41,14 +42,7 @@ public class JpaRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        Optional<Account> account = repository.findByUserName("김상민");
-        if(account.isEmpty()) {
-            throw new Exception("There is no account");
-        }
-        Account customer = account.get();
-
-
-
+        // Spring boot 수행시 기동 되는 로직 부분.
 
     }
 }
