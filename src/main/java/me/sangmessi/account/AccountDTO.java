@@ -10,6 +10,6 @@ public class AccountDTO {
 
     private String userName;
     private String email;
-    private int mobileNumber;
+    private String mobileNumber;
     private Set<Store> stores = new HashSet<>();
 }

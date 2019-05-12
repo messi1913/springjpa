@@ -41,6 +41,12 @@ public class JpaRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         // Spring boot 수행시 기동 되는 로직 부분.
+        Account account = new Account();
+        account.setEmail("messi1913@gmail.com");
+        account.setUserName("김상민");
+        account.setPassword("rlatkdap1");
+        account.setMobileNumber("010-9989-1913");
 
+//        repository.save(account);
     }
 }

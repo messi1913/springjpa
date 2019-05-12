@@ -10,6 +10,7 @@ import me.sangmessi.reservation.Reservation;
 import me.sangmessi.store.Store;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,11 +26,14 @@ public class Account implements Auditable {
 
     @Id @GeneratedValue
     private long id;
+    @NotNull
     @Column(nullable = false, unique = true)
     private String userName;
     private String password;
+    @NotNull
+    @Column(nullable = false, unique = true)
     private String email;
-    private Long mobileNumber;
+    private String mobileNumber;
 
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     private Set<Store> stores = new HashSet<>();
