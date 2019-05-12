@@ -1,5 +1,6 @@
 package me.sangmessi.account;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -19,6 +20,7 @@ import java.util.Set;
 @EqualsAndHashCode(of = "id")
 @EntityListeners(AuditListener.class)
 @ToString(exclude = {"stores", "reservations"})
+@Builder
 public class Account implements Auditable {
 
     @Embedded

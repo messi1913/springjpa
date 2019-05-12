@@ -30,8 +30,8 @@ public class AccountController {
 
     @GetMapping
     public ResponseEntity getUsers(@RequestParam String name) {
-        if(Objects.isNull(name))
-            return ResponseEntity.badRequest().body("Parameter is empty!!");
+//        if(Objects.isNull(name))
+//            return ResponseEntity.badRequest().body("Parameter is empty!!");
         try {
             List<AccountDTO> accountDTOList = service.getUsers(name);
             return ResponseEntity.ok(accountDTOList);
