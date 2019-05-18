@@ -2,17 +2,17 @@ package me.sangmessi.account;
 
 import lombok.RequiredArgsConstructor;
 import me.sangmessi.exception.NotFoundException;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
-import java.awt.print.Pageable;
-import java.util.List;
-import java.util.Objects;
+import java.lang.reflect.Type;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
@@ -23,6 +23,7 @@ public class AccountController {
 
     private final AccountService service;
     private final AccountValidator validator;
+    private final ModelMapper modelMapper;
 
     @GetMapping("/{id}")
     public ResponseEntity getUser(@PathVariable Long id) {
@@ -40,7 +41,11 @@ public class AccountController {
 
     @GetMapping
     public ResponseEntity getUsers(Pageable pageable, PagedResourcesAssembler<AccountDTO> assembler) {
-        //this.
+        Page<AccountDTO> accounts = this.service.getUsers(pageable);
+        var accountResource = assembler.toResource(accounts, p -> new AccountResource(p));
+        accountResource.add(new Link("/docs/index.html#resources-accounts-list").withRel("profile"));
+        accountResource.add(linkTo(AccountController.class).withRel("get-account"));
+        return ResponseEntity.ok(accountResource);
     }
 
     @PostMapping
@@ -49,7 +54,11 @@ public class AccountController {
             return badRequest(errors);
 
         AccountDTO accountDTO = service.createUser(account);
-        return ResponseEntity.ok(accountDTO);
+        var accountResource = new AccountResource(accountDTO);
+        accountResource.add(linkTo(AccountController.class).withSelfRel());
+        accountResource.add(new Link("/docs/index.html#resources-account-create").withRel("profile"));
+        accountResource.add(linkTo(AccountController.class).withRel("get-account"));
+        return ResponseEntity.ok(accountResource);
     }
 
     @PutMapping

@@ -1,5 +1,6 @@
 package me.sangmessi.account;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import me.sangmessi.common.Audit;
 import me.sangmessi.common.AuditListener;
@@ -20,9 +21,11 @@ import java.util.Set;
 @ToString(exclude = {"stores", "reservations"})
 @Builder
 @NoArgsConstructor  @AllArgsConstructor
+
 public class Account implements Auditable {
 
     @Embedded
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Audit audit;
 
     @Id @GeneratedValue
@@ -30,6 +33,7 @@ public class Account implements Auditable {
     @NotNull
     @Column(nullable = false, unique = true)
     private String userName;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String password;
     @NotNull
     @Column(nullable = false, unique = true)

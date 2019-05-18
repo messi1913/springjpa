@@ -13,6 +13,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class AccountDTO {
 
+    private Long id;
     private String userName;
     private String email;
     private String mobileNumber;
