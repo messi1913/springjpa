@@ -1,9 +1,6 @@
 package me.sangmessi.account;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
 import me.sangmessi.common.Audit;
 import me.sangmessi.common.AuditListener;
 import me.sangmessi.common.Auditable;
@@ -13,6 +10,7 @@ import me.sangmessi.store.Store;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Data
@@ -21,6 +19,7 @@ import java.util.Set;
 @EntityListeners(AuditListener.class)
 @ToString(exclude = {"stores", "reservations"})
 @Builder
+@NoArgsConstructor  @AllArgsConstructor
 public class Account implements Auditable {
 
     @Embedded
@@ -38,17 +37,21 @@ public class Account implements Auditable {
     private String mobileNumber;
 
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
-    private Set<Store> stores = new HashSet<>();
+    private Set<Store> stores;
 
     public void addStore(Store store) {
+        if(Objects.isNull(this.stores))
+            this.stores = new HashSet<>();
         this.stores.add(store);
         store.setOwner(this);
     }
 
     @OneToMany(mappedBy = "customer")
-    private Set<Reservation> reservations = new HashSet<>();
+    private Set<Reservation> reservations;
 
     public void addReservation(Reservation reservation) {
+        if(Objects.isNull(this.reservations))
+            this.reservations = new HashSet<>();
         this.reservations.add(reservation);
         reservation.setCustomer(this);
     }

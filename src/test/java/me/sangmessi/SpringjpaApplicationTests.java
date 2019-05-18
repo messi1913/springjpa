@@ -11,7 +11,6 @@ public class SpringjpaApplicationTests {
 
     @Test
     public void contextLoads() {
-        System.out.println("TEST 입니다. ");
     }
 
 }
