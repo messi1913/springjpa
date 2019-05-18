@@ -10,6 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
 
+import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.IntStream;
 
@@ -192,6 +193,101 @@ public class AccountControllerTest extends BaseControllerTest {
 
     @Test
     @MethodDescription("사용자 정보를 수정한다. ")
+    @Transactional
+    public void updateUser() throws Exception{
+        //When
+        List<Account> testList = this.repository.findByUserNameContaining("테스트_");
+        Account account = testList.get(testList.size() - 1);
+        AccountDTO accountDTO = modelMapper.map(account, AccountDTO.class);
+        accountDTO.setMobileNumber("010-9989-1913");
+
+        mockMvc.perform(put("/accounts")
+                .accept(MediaTypes.HAL_JSON)
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(objectMapper.writeValueAsString(accountDTO)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("userName").exists())
+                .andExpect(jsonPath("mobileNumber").exists())
+                .andExpect(jsonPath("email").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andDo(document("update-account",
+                        links(
+                                linkWithRel("self").description("link to self"),
+                                linkWithRel("profile").description("link to profile"),
+                                linkWithRel("get-account").description("link to retrieve an user")
+                        ),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.ACCEPT).description("accept header"),
+                                headerWithName(HttpHeaders.CONTENT_TYPE).description("content type")
+                        ),
+                        requestFields(
+                                fieldWithPath("id").type(Long.class).description("Identification of User"),
+                                fieldWithPath("email").type(String.class).description("Email of User"),
+                                fieldWithPath("userName").type(String.class).description("Name of User"),
+                                fieldWithPath("mobileNumber").type(String.class).description("Mobile number of User"),
+                                fieldWithPath("stores").type(Collections.class).description("Stores of user owned")
+                        ),
+                        responseHeaders(
+                                headerWithName(HttpHeaders.CONTENT_TYPE).description("Content Type")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").type(Long.class).description("Identification of User"),
+                                fieldWithPath("email").type(String.class).description("Email of User"),
+                                fieldWithPath("userName").type(String.class).description("Name of User"),
+                                fieldWithPath("mobileNumber").type(String.class).description("Mobile number of User"),
+                                fieldWithPath("stores").type(Collections.class).description("Stores of user owned"),
+                                fieldWithPath("_links.self.href").description("Link to self"),
+                                fieldWithPath("_links.get-account.href").description("Link to retrieve an user"),
+                                fieldWithPath("_links.profile.href").description("Link to update existing event")
+                        )
+
+                ));
+
+
+    }
+
+    @Test
+    @MethodDescription("사용자를 삭제 시킨다. ")
+    public void deleteUser() throws Exception {
+        List<Account> accoutList = this.repository.findByUserNameContaining("테스트_");
+        Account account = accoutList.get(accoutList.size() - 1);
+        long id = account.getId();
+        mockMvc.perform(delete("/accounts/{id}", id)
+                .accept(MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists())
+                .andDo(document("delete-account",
+                        links(
+                                linkWithRel("self").description("Link to self"),
+                                linkWithRel("get-accounts").description("Link to retrieve all users"),
+                                linkWithRel("profile").description("Link to profile")
+                        ),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.ACCEPT).description("Accept header")
+                        ),
+                        responseHeaders(
+                                headerWithName(HttpHeaders.CONTENT_TYPE).description("Content Type")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").type(Long.class).description("Identification of User"),
+                                fieldWithPath("email").type(String.class).description("Email of User"),
+                                fieldWithPath("userName").type(String.class).description("Name of User"),
+                                fieldWithPath("mobileNumber").type(String.class).description("Mobile number of User"),
+                                fieldWithPath("stores").type(Collections.class).description("Stores of user owned"),
+                                fieldWithPath("_links.self.href").description("Link to self"),
+                                fieldWithPath("_links.get-accounts.href").description("Link to retrieve one user"),
+                                fieldWithPath("_links.profile.href").description("Link to profile")
+                        )
+
+
+                        ));
+
+    }
 
 
     private Account generateAccount(int index) {
