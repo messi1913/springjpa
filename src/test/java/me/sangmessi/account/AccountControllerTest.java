@@ -45,7 +45,7 @@ public class AccountControllerTest extends BaseControllerTest {
                 .accept(MediaTypes.HAL_JSON)
                 .param("page", "1")
                 .param("size", "10")
-//                .param("sort", "name,DESC")
+                .param("sort", "userName,DESC")
             )
             .andDo(print())
             .andExpect(status().isOk())

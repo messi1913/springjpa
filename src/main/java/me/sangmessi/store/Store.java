@@ -18,7 +18,7 @@ import java.util.Set;
 @Entity
 @EqualsAndHashCode(of = "id")
 @EntityListeners(AuditListener.class)
-@ToString(exclude = {"owner", "reservations"})
+@ToString(exclude = {"owner"})
 public class Store implements Auditable {
 
     @Embedded
@@ -36,13 +36,13 @@ public class Store implements Auditable {
     private FoodType foodType;
     @ManyToOne
     private Account owner;
-    @OneToMany(mappedBy = "store", fetch = FetchType.LAZY)
-    private Set<Reservation> reservations = new HashSet<>();
-
-    public void addReservation(Reservation reservation) {
-        this.reservations.add(reservation);
-        reservation.setStore(this);
-    }
+//    @OneToMany(mappedBy = "store", fetch = FetchType.LAZY)
+//    private Set<Reservation> reservations = new HashSet<>();
+//
+//    public void addReservation(Reservation reservation) {
+//        this.reservations.add(reservation);
+//        reservation.setStore(this);
+//    }
 
 
 }

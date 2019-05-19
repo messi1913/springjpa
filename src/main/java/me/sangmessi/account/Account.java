@@ -41,6 +41,10 @@ public class Account implements Auditable {
     private String email;
     private String mobileNumber;
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Enumerated(EnumType.STRING)
+    private Set<AccountRole> roles;
+
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     private Set<Store> stores;
 
@@ -51,14 +55,14 @@ public class Account implements Auditable {
         store.setOwner(this);
     }
 
-    @OneToMany(mappedBy = "customer")
+    @OneToMany(mappedBy = "owner")
     private Set<Reservation> reservations;
 
     public void addReservation(Reservation reservation) {
         if(Objects.isNull(this.reservations))
             this.reservations = new HashSet<>();
         this.reservations.add(reservation);
-        reservation.setCustomer(this);
+        reservation.setOwner(this);
     }
 
 

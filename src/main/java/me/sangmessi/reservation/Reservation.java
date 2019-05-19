@@ -1,27 +1,26 @@
 package me.sangmessi.reservation;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 import me.sangmessi.account.Account;
 import me.sangmessi.common.Audit;
 import me.sangmessi.common.AuditListener;
 import me.sangmessi.common.Auditable;
-import me.sangmessi.store.Store;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Entity
 @Data
 @EntityListeners(AuditListener.class)
-@ToString(exclude = {"store", "customer"})
+@ToString(exclude = {"owner"})
 @EqualsAndHashCode(of = "id")
+@Builder @NoArgsConstructor  @AllArgsConstructor
 public class Reservation implements Auditable {
 
     @Embedded
+    @JsonIgnore
     private Audit audit;
 
     @GeneratedValue @Id
@@ -29,15 +28,13 @@ public class Reservation implements Auditable {
     @Column(nullable = false)
     @NotNull
     private LocalDateTime bookedOn;
-    @Column(nullable = false)
-    @NotNull
-    private int memberNumber;
+    private String description;
+    private int numbers;
+    @Enumerated(EnumType.STRING)
+    private ReservationStatus reservationStatus;
+    @Enumerated(EnumType.ORDINAL)
+    private ReservationType reservtionType;
 
     @ManyToOne
-    private Account customer;
-
-    @ManyToOne
-    private Store store;
-
-
+    private Account owner;
 }
