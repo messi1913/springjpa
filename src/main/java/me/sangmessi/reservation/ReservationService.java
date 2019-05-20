@@ -16,31 +16,39 @@ public class ReservationService {
     private final ReservationRepository repository;
     private final ModelMapper modelMapper;
 
-    public Reservation createReservation(Reservation reservation) {
-        return repository.save(reservation);
+    public ReservationDTO createReservation(ReservationDTO reservationDTO) {
+        Reservation reservation = modelMapper.map(reservationDTO, Reservation.class);
+        Reservation savedReservation = repository.save(reservation);
+        return modelMapper.map(savedReservation, ReservationDTO.class);
     }
 
-    public Reservation getReservation(Long id) {
+    public ReservationDTO getReservation(Long id) {
         Optional<Reservation> optionalReservation = repository.findById(id);
-        return optionalReservation.orElse(new Reservation());
-    }
-
-    public Reservation updateReservation(Reservation reservation) throws NotFoundException {
-        Optional<Reservation> optionalReservation = this.repository.findById(reservation.getId());
         if(optionalReservation.isEmpty())
-            throw new NotFoundException("There is no reservation");
+            return null;
 
-        Reservation reservationFromDB = optionalReservation.get();
-        modelMapper.map(reservation, reservationFromDB);
-
-        return this.repository.save(reservation);
+        return modelMapper.map(optionalReservation.get(), ReservationDTO.class);
     }
 
-    public void deleteReservation(Long id) {
+    public ReservationDTO updateReservation(ReservationDTO reservationDTO) throws NotFoundException {
+        Optional<Reservation> optionalReservation = this.repository.findById(reservationDTO.getId());
+        Reservation reservation = optionalReservation.orElseThrow(() -> new NotFoundException("There is no reservation to modify"));
+        modelMapper.map(reservationDTO, reservation);
+        Reservation updatedReservation = this.repository.save(reservation);
+        return modelMapper.map(updatedReservation, ReservationDTO.class);
+    }
+
+    public ReservationDTO deleteReservation(Long id) {
         this.repository.deleteById(id);
+        return ReservationDTO.builder().id(id).build();
     }
 
-    public Page<Reservation> getReservations(Pageable pageable) {
-        return this.repository.findAll(pageable);
+    public Page<ReservationDTO> getReservations(Pageable pageable) {
+        Page<Reservation> reservations = this.repository.findAll(pageable);
+        return reservations.map(this::to);
+    }
+
+    private ReservationDTO to(Reservation reservation) {
+        return modelMapper.map(reservation, ReservationDTO.class);
     }
 }

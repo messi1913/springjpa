@@ -33,7 +33,8 @@ public class Reservation implements Auditable {
     @Enumerated(EnumType.STRING)
     private ReservationStatus reservationStatus;
     @Enumerated(EnumType.ORDINAL)
-    private ReservationType reservtionType;
+    private ReservationType reservationType;
+    private String name;
 
     @ManyToOne
     private Account owner;

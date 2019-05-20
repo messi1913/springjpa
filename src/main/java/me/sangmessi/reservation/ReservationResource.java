@@ -3,9 +3,9 @@ package me.sangmessi.reservation;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 
-public class ReservationResource extends Resource<Reservation> {
+public class ReservationResource extends Resource<ReservationDTO> {
 
-    public ReservationResource(Reservation content, Link... links) {
+    public ReservationResource(ReservationDTO content, Link... links) {
         super(content, links);
     }
 }

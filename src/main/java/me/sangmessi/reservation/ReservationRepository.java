@@ -7,4 +7,6 @@ import java.util.List;
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
     List<Reservation> findAllByOwnerId(long ownerId);
+
+    List<Reservation> findAllByNameContaining(String name);
 }
