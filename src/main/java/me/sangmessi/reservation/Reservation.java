@@ -19,23 +19,28 @@ import java.time.LocalDateTime;
 @Builder @NoArgsConstructor  @AllArgsConstructor
 public class Reservation implements Auditable {
 
-    @Embedded
-    @JsonIgnore
-    private Audit audit;
+    @Id
+    @GeneratedValue
+    private Long id;
 
-    @GeneratedValue @Id
-    private long id;
     @Column(nullable = false)
     @NotNull
     private LocalDateTime bookedOn;
     private String description;
+    private String name;
     private int numbers;
     @Enumerated(EnumType.STRING)
     private ReservationStatus reservationStatus;
     @Enumerated(EnumType.ORDINAL)
     private ReservationType reservationType;
-    private String name;
+
+    private Integer deposit;
+    private Integer totalFee;
 
     @ManyToOne
     private Account owner;
+
+    @Embedded
+    @JsonIgnore
+    private Audit audit;
 }

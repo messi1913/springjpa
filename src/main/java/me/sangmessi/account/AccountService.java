@@ -6,19 +6,25 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Type;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class AccountService  {
+public class AccountService  implements UserDetailsService {
     private final AccountRepository accountRepository;
     private final ModelMapper modelMapper;
+    private final PasswordEncoder passwordEncoder;
 
     public AccountDTO getUser(Long id) throws NotFoundException {
         Optional<Account> accountOptional = accountRepository.findById(id);
@@ -45,11 +51,13 @@ public class AccountService  {
         Account accountFromDB = accountOptional.get();
         modelMapper.map(account , accountFromDB);
 
+        accountFromDB.setPassword(this.passwordEncoder.encode(accountFromDB.getPassword()));
         Account saveAccount = accountRepository.save(accountFromDB);
         return modelMapper.map(saveAccount, AccountDTO.class);
     }
 
     public AccountDTO createUser(Account account) {
+        account.setPassword(this.passwordEncoder.encode(account.getPassword()));
         Account saveAccount = accountRepository.save(account);
         return modelMapper.map(saveAccount, AccountDTO.class);
     }
@@ -75,5 +83,19 @@ public class AccountService  {
 
     public void deleteUser(Long id) {
         accountRepository.deleteById(id);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Account account = this.accountRepository.findByEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException(username));
+
+        return new User(account.getEmail(), account.getPassword(), getAuthorities(account.getRoles()));
+    }
+
+    private Collection<? extends GrantedAuthority> getAuthorities(Set<AccountRole> roles) {
+        return roles.stream().map(r -> new SimpleGrantedAuthority("ROLE_"+r.name()))
+                .collect(Collectors.toSet());
+
     }
 }

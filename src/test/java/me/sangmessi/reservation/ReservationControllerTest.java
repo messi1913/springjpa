@@ -1,5 +1,6 @@
 package me.sangmessi.reservation;
 
+import me.sangmessi.account.Account;
 import me.sangmessi.common.BaseControllerTest;
 import me.sangmessi.common.MethodDescription;
 import org.junit.Before;
@@ -47,7 +48,7 @@ public class ReservationControllerTest extends BaseControllerTest {
 
         //When
         mockMvc.perform(get("/api/reservations/{id}", id)
-                    .accept(MediaTypes.HAL_JSON))
+                .accept(MediaTypes.HAL_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("name").exists())
@@ -68,7 +69,7 @@ public class ReservationControllerTest extends BaseControllerTest {
                         responseHeaders(
                                 headerWithName(HttpHeaders.CONTENT_TYPE).description("Contents Type to Client")
                         ),
-                        requestFields(
+                        responseFields(
                                 fieldWithPath("id").type(Long.class).description("Identification of reservation"),
                                 fieldWithPath("bookedOn").type(LocalDateTime.class).description("Reservation time"),
                                 fieldWithPath("name").type(String.class).description("Name of reservation"),
@@ -76,11 +77,13 @@ public class ReservationControllerTest extends BaseControllerTest {
                                 fieldWithPath("numbers").type(Integer.class).description("The number of participants"),
                                 fieldWithPath("reservationStatus").type(ReservationStatus.class).description("Status of reservation"),
                                 fieldWithPath("reservationType").type(ReservationType.class).description("Type of reservation"),
+                                fieldWithPath("deposit").type(Integer.class).description("Deposit for reservation"),
+                                fieldWithPath("totalFee").type(Integer.class).description("Total fee of reservation"),
                                 fieldWithPath("_links.self.href").type(String.class).description("Link to retrieve reservation"),
                                 fieldWithPath("_links.profile.href").type(String.class).description("Link to profile reservation"),
                                 fieldWithPath("_links.update-reservation.href").type(String.class).description("Link to modify this reservation")
                         )
-        ));
+                ));
     }
 
     @Test
@@ -116,19 +119,22 @@ public class ReservationControllerTest extends BaseControllerTest {
                         responseHeaders(
                                 headerWithName(HttpHeaders.CONTENT_TYPE).description("Contents Type to Client")
                         ),
-                        requestFields(
+                        responseFields(
                                 fieldWithPath("page.size").type(String.class).description("Size of page"),
-                                fieldWithPath("page.totlaElements").type(String.class).description("The total number of elements"),
+                                fieldWithPath("page.totalElements").type(String.class).description("The total number of elements"),
                                 fieldWithPath("page.totalPages").type(String.class).description("The total number of pages"),
                                 fieldWithPath("page.number").type(String.class).description("The current page number"),
                                 fieldWithPath("_embedded.reservationDTOList").type(Collections.class).description("list of User"),
-//                                fieldWithPath("id").type(Long.class).description("Identification of reservation"),
-//                                fieldWithPath("bookedOn").type(LocalDateTime.class).description("Reservation time"),
-//                                fieldWithPath("name").type(String.class).description("Name of reservation"),
-//                                fieldWithPath("description").type(String.class).description("Description of reservation"),
-//                                fieldWithPath("numbers").type(String.class).description("The number of participants"),
-//                                fieldWithPath("reservationStatus").type(ReservationStatus.class).description("Status of reservation"),
-//                                fieldWithPath("reservationType").type(ReservationType.class).description("Type of reservation"),
+                                fieldWithPath("_embedded.reservationDTOList[].id").type(Long.class).description("Identification of reservation"),
+                                fieldWithPath("_embedded.reservationDTOList[].bookedOn").type(LocalDateTime.class).description("Reservation time"),
+                                fieldWithPath("_embedded.reservationDTOList[].name").type(String.class).description("Name of reservation"),
+                                fieldWithPath("_embedded.reservationDTOList[].description").type(String.class).description("Description of reservation"),
+                                fieldWithPath("_embedded.reservationDTOList[].numbers").type(Integer.class).description("The number of participants"),
+                                fieldWithPath("_embedded.reservationDTOList[].reservationStatus").type(ReservationStatus.class).description("Status of reservation"),
+                                fieldWithPath("_embedded.reservationDTOList[].reservationType").type(ReservationType.class).description("Type of reservation"),
+                                fieldWithPath("_embedded.reservationDTOList[].deposit").type(Integer.class).description("Deposit for reservation"),
+                                fieldWithPath("_embedded.reservationDTOList[].totalFee").type(Integer.class).description("Total fee of reservation"),
+
                                 fieldWithPath("_links.self.href").type(String.class).description("Link to self"),
                                 fieldWithPath("_links.profile.href").type(String.class).description("Link to profile"),
                                 fieldWithPath("_links.get-reservation.href").type(String.class).description("Link to retrieve an reservation"),
@@ -169,9 +175,6 @@ public class ReservationControllerTest extends BaseControllerTest {
                         requestHeaders(
                                 headerWithName(HttpHeaders.ACCEPT).description("Accept Type to Server")
                         ),
-                        responseHeaders(
-                                headerWithName(HttpHeaders.CONTENT_TYPE).description("Contents Type to Client")
-                        ),
                         requestFields(
                                 fieldWithPath("id").type(Long.class).description("Identification of reservation"),
                                 fieldWithPath("bookedOn").type(LocalDateTime.class).description("Reservation time"),
@@ -180,6 +183,23 @@ public class ReservationControllerTest extends BaseControllerTest {
                                 fieldWithPath("numbers").type(Integer.class).description("The number of participants"),
                                 fieldWithPath("reservationStatus").type(ReservationStatus.class).description("Status of reservation"),
                                 fieldWithPath("reservationType").type(ReservationType.class).description("Type of reservation"),
+                                fieldWithPath("deposit").type(Integer.class).description("Deposit for reservation"),
+                                fieldWithPath("totalFee").type(Integer.class).description("Total fee of reservation"),
+                                fieldWithPath("owner").type(Account.class).description("Account Info")
+                        ),
+                        responseHeaders(
+                                headerWithName(HttpHeaders.CONTENT_TYPE).description("Contents Type to Client")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").type(Long.class).description("Identification of reservation"),
+                                fieldWithPath("bookedOn").type(LocalDateTime.class).description("Reservation time"),
+                                fieldWithPath("name").type(String.class).description("Name of reservation"),
+                                fieldWithPath("description").type(String.class).description("Description of reservation"),
+                                fieldWithPath("numbers").type(Integer.class).description("The number of participants"),
+                                fieldWithPath("reservationStatus").type(ReservationStatus.class).description("Status of reservation"),
+                                fieldWithPath("reservationType").type(ReservationType.class).description("Type of reservation"),
+                                fieldWithPath("deposit").type(Integer.class).description("Deposit for reservation"),
+                                fieldWithPath("totalFee").type(Integer.class).description("Total fee of reservation"),
                                 fieldWithPath("_links.self.href").type(String.class).description("Link to retrieve reservation"),
                                 fieldWithPath("_links.profile.href").type(String.class).description("Link to profile reservation"),
                                 fieldWithPath("_links.get-reservation.href").type(String.class).description("Link to retrieve this reservation")
@@ -219,9 +239,6 @@ public class ReservationControllerTest extends BaseControllerTest {
                         requestHeaders(
                                 headerWithName(HttpHeaders.ACCEPT).description("Accept Type to Server")
                         ),
-                        responseHeaders(
-                                headerWithName(HttpHeaders.CONTENT_TYPE).description("Contents Type to Client")
-                        ),
                         requestFields(
                                 fieldWithPath("id").type(Long.class).description("Identification of reservation"),
                                 fieldWithPath("bookedOn").type(LocalDateTime.class).description("Reservation time"),
@@ -230,6 +247,23 @@ public class ReservationControllerTest extends BaseControllerTest {
                                 fieldWithPath("numbers").type(Integer.class).description("The number of participants"),
                                 fieldWithPath("reservationStatus").type(ReservationStatus.class).description("Status of reservation"),
                                 fieldWithPath("reservationType").type(ReservationType.class).description("Type of reservation"),
+                                fieldWithPath("deposit").type(Integer.class).description("Deposit for reservation"),
+                                fieldWithPath("totalFee").type(Integer.class).description("Total fee of reservation"),
+                                fieldWithPath("owner").type(Account.class).description("Account Info")
+                        ),
+                        responseHeaders(
+                                headerWithName(HttpHeaders.CONTENT_TYPE).description("Contents Type to Client")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").type(Long.class).description("Identification of reservation"),
+                                fieldWithPath("bookedOn").type(LocalDateTime.class).description("Reservation time"),
+                                fieldWithPath("name").type(String.class).description("Name of reservation"),
+                                fieldWithPath("description").type(String.class).description("Description of reservation"),
+                                fieldWithPath("numbers").type(Integer.class).description("The number of participants"),
+                                fieldWithPath("reservationStatus").type(ReservationStatus.class).description("Status of reservation"),
+                                fieldWithPath("reservationType").type(ReservationType.class).description("Type of reservation"),
+                                fieldWithPath("deposit").type(Integer.class).description("Deposit for reservation"),
+                                fieldWithPath("totalFee").type(Integer.class).description("Total fee of reservation"),
                                 fieldWithPath("_links.self.href").type(String.class).description("Link to retrieve reservation"),
                                 fieldWithPath("_links.profile.href").type(String.class).description("Link to profile reservation"),
                                 fieldWithPath("_links.get-reservation.href").type(String.class).description("Link to retrieve this reservation")
@@ -283,12 +317,13 @@ public class ReservationControllerTest extends BaseControllerTest {
                 .name("TEST_"+index)
                 .description("TEST")
                 .numbers(index)
-                .reservationStatus(ReservationStatus.ASK_BOOKING)
+                .reservationStatus(ReservationStatus.PREBOOKED)
                 .reservationType(ReservationType.FOOD)
                 .build();
 
         return this.reservationRepository.save(reservation);
     }
+
 
 
 }

@@ -1,4 +1,4 @@
-= Account REST API Guide
+= reservation REST API Guide
 SANGMESSI;
 :doctype: book
 :icons: font
@@ -71,9 +71,39 @@ SANGMESSI;
 
 사용자 리소스는 회원가입을 하거나 사용자 조회 , 수정, 삭제할때 사용한다.
 
+[[resources-reservations-list]]
+=== 사용자 목록 조회
+
+`GET` 요청을 사용하여 서비스의 모든 사용자를 조회할 수 있다.
+
+operation::get-reservations[snippets='http-request,curl-request,http-response,response-fields,links']
+
 [[resources-reservation-get]]
 === 사용자 한건 조회
 
 `GET` 요청을 사용해서 기존 사용자를 조회 할 수 있다.
 
 operation::get-reservation[snippets='http-request,curl-request,http-response,response-fields,links']
+
+
+[[resources-reservation-create]]
+=== 사용자 생성
+
+`POST` 요청을 사용해서 새 사용자를 생성 할 수 있다.
+
+operation::create-reservation[snippets='request-fields,http-request,request-headers,curl-request,http-response,response-headers,response-fields,links']
+
+[[resources-reservation-update]]
+=== 사용자 수정
+
+`PUT` 요청을 사용해서 기존 사용자를 수정할 수 있다.
+
+operation::update-reservation[snippets='request-fields,http-request,request-headers,curl-request,http-response,response-headers,response-fields,links']
+
+[[resources-reservation-delete]]
+=== 이벤트 삭제
+
+`DELETE` 요청을 사용해서 기존 이벤트를 수정할 수 있다.
+
+operation::delete-reservation[snippets='http-request,curl-request,http-response,response-fields,links']
+
