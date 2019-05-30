@@ -1,6 +1,7 @@
 package me.sangmessi.reservation;
 
 import me.sangmessi.account.Account;
+import me.sangmessi.common.AppProperties;
 import me.sangmessi.common.BaseControllerTest;
 import me.sangmessi.common.MethodDescription;
 import org.junit.Before;
@@ -9,19 +10,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.common.util.Jackson2JsonParser;
+import org.springframework.test.web.servlet.ResultActions;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.IntStream;
 
 import static org.springframework.restdocs.headers.HeaderDocumentation.*;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -31,12 +34,14 @@ public class ReservationControllerTest extends BaseControllerTest {
 
     @Autowired
     ReservationRepository reservationRepository;
+    @Autowired
+    AppProperties appProperties;
 
     @Before
     public void initializeTestData() {
-        List<Reservation> all = this.reservationRepository.findAllByNameContaining("TEST_");
-        this.reservationRepository.deleteAll(all);
-        IntStream.range(0, 100).forEach(this::generateReservation);
+//        List<Reservation> all = this.reservationRepository.findAllByNameContaining("TEST_");
+//        this.reservationRepository.deleteAll(all);
+//        IntStream.range(0, 100).forEach(this::generateReservation);
     }
 
     @Test
@@ -157,6 +162,7 @@ public class ReservationControllerTest extends BaseControllerTest {
         mockMvc.perform(post("/api/reservations")
                 .accept(MediaTypes.HAL_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, getBearerToken())
                 .content(objectMapper.writeValueAsString(reservation)))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -219,6 +225,7 @@ public class ReservationControllerTest extends BaseControllerTest {
         reservation.setDescription("예약내용 변경됫습니다.");
         //When
         mockMvc.perform(put("/api/reservations")
+                .header(HttpHeaders.AUTHORIZATION, getBearerToken())
                 .accept(MediaTypes.HAL_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(reservation)))
@@ -281,12 +288,11 @@ public class ReservationControllerTest extends BaseControllerTest {
 
         //When
         mockMvc.perform(delete("/api/reservations/{id}", id)
+                .header(HttpHeaders.AUTHORIZATION, getBearerToken())
                 .accept(MediaTypes.HAL_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("name").exists())
-                .andExpect(jsonPath("description").exists())
-                .andExpect(jsonPath("bookedOn").exists())
+                .andExpect(jsonPath("id").exists())
                 .andExpect(jsonPath("_links.self").exists())
                 .andExpect(jsonPath("_links.profile").exists())
                 .andExpect(jsonPath("_links.create-reservation").exists())
@@ -302,13 +308,38 @@ public class ReservationControllerTest extends BaseControllerTest {
                         responseHeaders(
                                 headerWithName(HttpHeaders.CONTENT_TYPE).description("Contents Type to Client")
                         ),
-                        requestFields(
+                        responseFields(
                                 fieldWithPath("id").type(Long.class).description("Deleted identification of reservation"),
+                                fieldWithPath("bookedOn").type(LocalDateTime.class).description("Reservation time"),
+                                fieldWithPath("name").type(String.class).description("Name of reservation"),
+                                fieldWithPath("description").type(String.class).description("Description of reservation"),
+                                fieldWithPath("numbers").type(Integer.class).description("The number of participants"),
+                                fieldWithPath("reservationStatus").type(ReservationStatus.class).description("Status of reservation"),
+                                fieldWithPath("reservationType").type(ReservationType.class).description("Type of reservation"),
+                                fieldWithPath("deposit").type(Integer.class).description("Deposit for reservation"),
+                                fieldWithPath("totalFee").type(Integer.class).description("Total fee of reservation"),
                                 fieldWithPath("_links.self.href").type(String.class).description("Link to retrieve reservation"),
                                 fieldWithPath("_links.profile.href").type(String.class).description("Link to profile reservation"),
                                 fieldWithPath("_links.create-reservation.href").type(String.class).description("Link to make a reservation")
                         )
                 ));
+    }
+
+    private String getBearerToken() throws Exception {
+        return "Bearer " + getAccessToken();
+    }
+
+    private String getAccessToken() throws Exception {
+        ResultActions perform = this.mockMvc.perform(post("/oauth/token")
+                .with(httpBasic(appProperties.getClientId(), appProperties.getClientSecret()))
+                .param("username", appProperties.getUserUsername())
+                .param("password", appProperties.getUserPassword())
+                .param("grant_type", "password"))
+                .andDo(print());
+
+        var responseBody = perform.andReturn().getResponse().getContentAsString();
+        Jackson2JsonParser parser = new Jackson2JsonParser();
+        return parser.parseMap(responseBody).get("access_token").toString();
     }
 
     private Reservation generateReservation(int index) {

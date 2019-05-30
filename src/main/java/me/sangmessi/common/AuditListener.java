@@ -21,7 +21,10 @@ public class AuditListener {
     @PreUpdate
     public void setUpdatedOn(Auditable auditable) {
         Audit audit = auditable.getAudit();
-
+        if(Objects.isNull(audit)) {
+            audit = new Audit();
+            auditable.setAudit(audit);
+        }
         audit.setUpdatedOn(LocalDateTime.now());
         audit.setUpdatedBy("Updated User");
     }

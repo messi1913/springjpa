@@ -45,7 +45,7 @@ public class ReservationController {
     public ResponseEntity retrieveReservations(Pageable pageable, PagedResourcesAssembler<ReservationDTO> assembler) {
         Page<ReservationDTO> reservations = this.service.getReservations(pageable);
         var resource = assembler.toResource(reservations, r -> new ReservationResource(r));
-        resource.add(linkTo(ReservationController.class).withSelfRel());
+//        resource.add(linkTo(ReservationController.class).withSelfRel());
         resource.add(linkTo(ReservationController.class).withRel("get-reservation"));
         resource.add(new Link("/docs/reservation.html#resources-reservation-list").withRel("profile"));
         return ResponseEntity.ok(resource);
@@ -85,7 +85,7 @@ public class ReservationController {
         }
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     @MethodDescription("예약 취소를 통한 예약 내역 삭제를 하는 API")
     public ResponseEntity deleteReservation(@PathVariable Long id) {
         ReservationDTO reservationDTO = this.service.deleteReservation(id);
