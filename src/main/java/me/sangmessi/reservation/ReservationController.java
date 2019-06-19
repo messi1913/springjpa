@@ -1,6 +1,8 @@
 package me.sangmessi.reservation;
 
 import lombok.RequiredArgsConstructor;
+import me.sangmessi.account.Account;
+import me.sangmessi.account.CurrentUser;
 import me.sangmessi.common.ErrorResource;
 import me.sangmessi.common.MethodDescription;
 import me.sangmessi.exception.NotFoundException;
@@ -11,6 +13,9 @@ import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,7 +33,7 @@ public class ReservationController {
 
     @GetMapping("/{id}")
     @MethodDescription("ID 를 통해서 예약 결재건 한건을 조회한다.")
-    public ResponseEntity retrieveReservation(@PathVariable Long id) {
+    public ResponseEntity retrieveReservation(@PathVariable Long id, @CurrentUser Account currentUser) {
         ReservationDTO reservation = this.service.getReservation(id);
         if(Objects.isNull(reservation))
             return ResponseEntity.badRequest().body("We can't find this reservation");
@@ -53,11 +58,14 @@ public class ReservationController {
 
     @PostMapping
     @MethodDescription("예약 신청을 통해서 예약을 생성하는 API")
-    public ResponseEntity createReservation(@RequestBody @Valid ReservationDTO reservationDTO, Errors errors) {
+    public ResponseEntity createReservation(@RequestBody @Valid ReservationDTO reservationDTO,
+                                            Errors errors,
+                                            @CurrentUser Account currentUser) {
+
         if(errors.hasErrors())
             return badRequest(errors);
 
-        ReservationDTO reservation = this.service.createReservation(reservationDTO);
+        ReservationDTO reservation = this.service.createReservation(reservationDTO, currentUser);
         var resource = new ReservationResource(reservation);
         resource.add(linkTo(ReservationController.class).withSelfRel());
         resource.add(linkTo(ReservationController.class).withRel("get-reservation"));
@@ -89,6 +97,10 @@ public class ReservationController {
     @MethodDescription("예약 취소를 통한 예약 내역 삭제를 하는 API")
     public ResponseEntity deleteReservation(@PathVariable Long id) {
         ReservationDTO reservationDTO = this.service.deleteReservation(id);
+
+
+
+
         var resource = new ReservationResource(reservationDTO);
         resource.add(linkTo(ReservationController.class).slash(reservationDTO.getId()).withSelfRel());
         resource.add(linkTo(ReservationController.class).withRel("create-reservation"));

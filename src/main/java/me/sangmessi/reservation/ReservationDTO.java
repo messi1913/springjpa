@@ -33,5 +33,5 @@ public class ReservationDTO {
     private Integer deposit;
     private Integer totalFee;
 
-//    private Account owner;
+    private Account owner;
 }

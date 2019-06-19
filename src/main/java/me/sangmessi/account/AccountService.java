@@ -90,7 +90,8 @@ public class AccountService  implements UserDetailsService {
         Account account = this.accountRepository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException(username));
 
-        return new User(account.getEmail(), account.getPassword(), getAuthorities(account.getRoles()));
+        //return new User(account.getEmail(), account.getPassword(), getAuthorities(account.getRoles()));
+        return new AccountAdapter(account);
     }
 
     private Collection<? extends GrantedAuthority> getAuthorities(Set<AccountRole> roles) {

@@ -1,6 +1,7 @@
 package me.sangmessi.reservation;
 
 import lombok.RequiredArgsConstructor;
+import me.sangmessi.account.Account;
 import me.sangmessi.exception.NotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -16,8 +17,9 @@ public class ReservationService {
     private final ReservationRepository repository;
     private final ModelMapper modelMapper;
 
-    public ReservationDTO createReservation(ReservationDTO reservationDTO) {
+    public ReservationDTO createReservation(ReservationDTO reservationDTO, Account currentUser) {
         Reservation reservation = modelMapper.map(reservationDTO, Reservation.class);
+        reservation.setOwner(currentUser);
         Reservation savedReservation = repository.save(reservation);
         return modelMapper.map(savedReservation, ReservationDTO.class);
     }
