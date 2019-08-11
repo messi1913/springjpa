@@ -19,7 +19,7 @@ public class ReservationService {
 
     public ReservationDTO createReservation(ReservationDTO reservationDTO, Account currentUser) {
         Reservation reservation = modelMapper.map(reservationDTO, Reservation.class);
-        reservation.setOwner(currentUser);
+        reservation.setUser(currentUser);
         Reservation savedReservation = repository.save(reservation);
         return modelMapper.map(savedReservation, ReservationDTO.class);
     }

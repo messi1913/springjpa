@@ -11,9 +11,7 @@ import me.sangmessi.store.Store;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Data
 @Entity
@@ -24,10 +22,6 @@ import java.util.Set;
 @NoArgsConstructor  @AllArgsConstructor
 
 public class Account implements Auditable {
-
-    @Embedded
-    @JsonIgnore
-    private Audit audit;
 
     @Id @GeneratedValue
     private long id;
@@ -41,29 +35,28 @@ public class Account implements Auditable {
     private String email;
     private String mobileNumber;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection
     @Enumerated(EnumType.STRING)
     private Set<AccountRole> roles;
 
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
-    private Set<Store> stores;
+    @OneToMany(mappedBy = "owner", fetch = FetchType.EAGER)
+    private Set<Store> stores = new HashSet<>();
 
     public void addStore(Store store) {
-        if(Objects.isNull(this.stores))
-            this.stores = new HashSet<>();
         this.stores.add(store);
         store.setOwner(this);
     }
 
-    @OneToMany(mappedBy = "owner")
-    private Set<Reservation> reservations;
+    @OneToMany(mappedBy = "user")
+    private List<Reservation> reservations = new ArrayList<>();
 
     public void addReservation(Reservation reservation) {
-        if(Objects.isNull(this.reservations))
-            this.reservations = new HashSet<>();
         this.reservations.add(reservation);
-        reservation.setOwner(this);
+        reservation.setUser(this);
     }
 
+    @Embedded
+    @JsonIgnore
+    private Audit audit;
 
 }

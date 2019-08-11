@@ -1,30 +1,29 @@
 package me.sangmessi.store;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
 import me.sangmessi.account.Account;
 import me.sangmessi.common.Audit;
 import me.sangmessi.common.AuditListener;
 import me.sangmessi.common.Auditable;
 import me.sangmessi.reservation.Reservation;
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Entity
 @EqualsAndHashCode(of = "id")
 @EntityListeners(AuditListener.class)
-@ToString(exclude = {"owner"})
+@ToString(exclude = {"owner", "reservations"})
+@Builder
+@NoArgsConstructor @AllArgsConstructor
 public class Store implements Auditable {
 
-    @Embedded
-    Audit audit;
-
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
+    @Column(name = "store_id")
     private long id;
     @Column(nullable = false)
     private String name;
@@ -32,17 +31,22 @@ public class Store implements Auditable {
     private Long number;
     @Column(nullable = false)
     private String address;
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private FoodType foodType;
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_id")
     private Account owner;
-//    @OneToMany(mappedBy = "store", fetch = FetchType.LAZY)
-//    private Set<Reservation> reservations = new HashSet<>();
-//
-//    public void addReservation(Reservation reservation) {
-//        this.reservations.add(reservation);
-//        reservation.setStore(this);
-//    }
 
+    @OneToMany(mappedBy = "store")
+    private List<Reservation> reservations = new ArrayList<>();
 
+    public void addReservation(Reservation reservation) {
+        reservations.add(reservation);
+        reservation.setStore(this);
+    }
+
+    @Embedded
+    @JsonIgnore
+    Audit audit;
 }

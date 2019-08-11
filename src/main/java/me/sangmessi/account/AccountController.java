@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
 @RestController
-@RequestMapping(value = "/accounts", produces = MediaTypes.HAL_JSON_UTF8_VALUE)
+@RequestMapping(value = "/api/accounts", produces = MediaTypes.HAL_JSON_UTF8_VALUE)
 @RequiredArgsConstructor
 public class AccountController {
 
